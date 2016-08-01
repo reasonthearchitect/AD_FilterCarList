@@ -34,7 +34,7 @@ public class CarRest {
 
         private String carWatchServiceUrl = new String("http://localhost/watchingcars/getwatchlist/{name}");
 
-        private String carStoreUrl = new String("http://localhost/api/carlistnotwatching/");
+        private String carStoreUrl = new String("http://localhost/api/carlistwatching/");
 
         public CarRest() {
                 this.carWatchService = new RestTemplate();
@@ -48,6 +48,18 @@ public class CarRest {
                 method = RequestMethod.GET,
                 produces = MediaType.APPLICATION_JSON_VALUE)
         public ResponseEntity<List<Car>> getCarsBuyerNotWatching(@PathVariable String name) throws URISyntaxException {
+                CarBuyerIsWatchingDto carsBuyerIsWatchingDto = new CarBuyerIsWatchingDto();
+                carsBuyerIsWatchingDto.setVins(this.getCarBuyerIsWatchingList(name));
+                @SuppressWarnings("unchecked")
+                List<Car> returns = this.carStoreService.postForObject(carStoreUrl, carsBuyerIsWatchingDto, ((Class<List<Car>>)(Object)List.class), vars);
+                HttpHeaders httpHeaders = new HttpHeaders();
+                return new ResponseEntity<>(returns, httpHeaders, HttpStatus.OK);
+        }
+
+        @RequestMapping(value = "/buyerwatching/{name}",
+                method = RequestMethod.GET,
+                produces = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<List<Car>> getCarsBuyerWatching(@PathVariable String name) throws URISyntaxException {
                 CarBuyerIsWatchingDto carsBuyerIsWatchingDto = new CarBuyerIsWatchingDto();
                 carsBuyerIsWatchingDto.setVins(this.getCarBuyerIsWatchingList(name));
                 @SuppressWarnings("unchecked")
