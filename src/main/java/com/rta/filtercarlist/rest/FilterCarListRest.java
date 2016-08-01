@@ -2,6 +2,7 @@ package com.rta.filtercarlist.rest;
 
 import com.rta.filtercarlist.dto.Bid;
 import com.rta.filtercarlist.dto.CarBuyerIsWatchingDto;
+import com.rta.filtercarlist.dto.ResponseBuyerWatching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,7 @@ import com.rta.filtercarlist.dto.Car;
 
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/filtercarlist")
@@ -74,33 +72,19 @@ public class FilterCarListRest {
                 method = RequestMethod.GET,
                 produces = MediaType.APPLICATION_JSON_VALUE)
         @SuppressWarnings("unchecked")
-        public ResponseEntity<List<Car>> getCarsBuyerWatching(@PathVariable String name) throws URISyntaxException {
-                CarBuyerIsWatchingDto carsBuyerIsWatchingDto = new CarBuyerIsWatchingDto();
-                carsBuyerIsWatchingDto.setVins(this.getCarBuyerIsWatchingList(name));
-                List<Car> returns = null;
-                if(carsBuyerIsWatchingDto.getVins() == null || carsBuyerIsWatchingDto.getVins().isEmpty() ) {
-                        returns = new ArrayList<>();
-                } else {
-                        returns = this.carStoreService.postForObject(this.carStoreUrlWatching, carsBuyerIsWatchingDto, ((Class<List<Car>>) (Object) List.class), vars);
-                        Map<String, Bid> highestBidMap = this.bidStoreService.postForObject(this.bidStoreUrl, carsBuyerIsWatchingDto.getVins(), ((Class<Map<String, Bid>>) (Object) Map.class), vars);
-                        this.updateHighestBidsForReturnToClient(name, returns, highestBidMap);
-                }
-                HttpHeaders httpHeaders = new HttpHeaders();
-                return new ResponseEntity<>(returns, httpHeaders, HttpStatus.OK);
-        }
-
-        private void updateHighestBidsForReturnToClient(String name, List<Car> cars, Map<String, Bid> highestBidMap) {
-                for (Car car : cars) {
-                        if (highestBidMap.containsKey(car.getVin() )) {
-                                Bid bid = highestBidMap.get(car.getVin());
-                                car.setHighestBid(bid.getAmount());
-                                if (name.equals(bid.getId())) {
-                                        car.setMyBid(true);
-                                }
-                        } else {
-                                car.setHighestBid(new BigDecimal(0));
-                        }
-                }
+        public ResponseEntity<ResponseBuyerWatching> getCarsBuyerWatching(@PathVariable String name) throws URISyntaxException {
+            CarBuyerIsWatchingDto carsBuyerIsWatchingDto = new CarBuyerIsWatchingDto();
+            carsBuyerIsWatchingDto.setVins(this.getCarBuyerIsWatchingList(name));
+            ResponseBuyerWatching responseBuyerWatching = new ResponseBuyerWatching();
+            if(carsBuyerIsWatchingDto.getVins() == null || carsBuyerIsWatchingDto.getVins().isEmpty() ) {
+                responseBuyerWatching.setCars(new ArrayList<>());
+                responseBuyerWatching.setHighestBidMap(new HashMap<>());
+            } else {
+                responseBuyerWatching.setCars( this.carStoreService.postForObject(this.carStoreUrlWatching, carsBuyerIsWatchingDto, ((Class<ArrayList<Car>>) (Object) ArrayList.class), vars));
+                responseBuyerWatching.setHighestBidMap( this.bidStoreService.postForObject(this.bidStoreUrl, carsBuyerIsWatchingDto.getVins(), ((Class<Map<String, Bid>>) (Object) Map.class), vars));
+            }
+            HttpHeaders httpHeaders = new HttpHeaders();
+            return new ResponseEntity<>(responseBuyerWatching, httpHeaders, HttpStatus.OK);
         }
 
         private List<String> getCarBuyerIsWatchingList(String name) {
