@@ -1,0 +1,8 @@
+{
+  "generator-spring-rest": {
+    "baseName": "filterCarList",
+    "packageName": "com.rta.filtercarlist",
+    "packageNameGenerated": "com.rta.filtercarlist.generated",
+    "adddocker": "yes"
+  }
+}

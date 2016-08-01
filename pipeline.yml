@@ -1,0 +1,28 @@
+---
+resources:
+- name: resource-filterCarList
+  type: git
+  source:
+    uri: https://github.com/reasonthearchitect/AD_FilterCarList.git
+    branch: master
+
+- name: filterCarList-docker-image
+  type: docker-image
+  source:
+    repository: {{docker-hub-image-name}}
+    email: {{docker-hub-email}}
+    username: {{docker-hub-username}}
+    password: {{docker-hub-api-key}}
+
+jobs:
+- name: job-build-docker
+  public: true
+  serial: true
+  plan:
+    - get: resource-filterCarList
+      trigger: true
+    - task: job-build
+      file: resource-filterCarList/ci/tasks/package.yml
+    - put: filterCarList-docker-image
+      params:
+        build: resource-jar
