@@ -1,7 +1,7 @@
 package com.rta.filtercarlist.test.rest
 
 import com.rta.filtercarlist.dto.Car
-import com.rta.filtercarlist.rest.CarRest
+import com.rta.filtercarlist.rest.FilterCarListRest
 import com.rta.filtercarlist.stream.CarSource
 
 import org.springframework.http.HttpStatus
@@ -11,10 +11,10 @@ import spock.lang.Specification
 
 class CarRestSpec extends Specification {
 
-    CarRest carRest;
+    FilterCarListRest carRest;
 
     def setup() {
-        this.carRest        = new CarRest();
+        this.carRest        = new FilterCarListRest();
         this.carRest.source = Mock(CarSource);
     }
 

@@ -19,5 +19,7 @@ public class Car {
     private BigDecimal stockNumber;
     private String comments;
     private String additionalComments;
+    private BigDecimal highestBid;
+    private boolean myBid;
 }
 

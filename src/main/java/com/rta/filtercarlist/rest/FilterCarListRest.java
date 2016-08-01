@@ -1,5 +1,6 @@
 package com.rta.filtercarlist.rest; 
 
+import com.rta.filtercarlist.dto.Bid;
 import com.rta.filtercarlist.dto.CarBuyerIsWatchingDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.rta.filtercarlist.stream.CarSource;
 import com.rta.filtercarlist.dto.Car;
 
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/filtercarlist")
-public class CarRest {
+public class FilterCarListRest {
 
         @Autowired
         private CarSource source;
@@ -33,20 +35,27 @@ public class CarRest {
 
         private RestTemplate carStoreService;
 
-        private String carWatchServiceUrl = new String("http://localhost/watchingcars/getwatchlist/{name}");
+        private RestTemplate bidStoreService;
 
-        private String carStoreUrlWatching = new String("http://localhost/api/carlistwatching/");
+        private String carWatchServiceUrl       = "http://localhost/watchingcars/getwatchlist/{name}";
 
-        private String carStoreUrlNotWatching = new String("http://localhost/api/carlistnotwatching/");
+        private String carStoreUrlWatching      = "http://localhost/api/carlistwatching/";
+
+        private String carStoreUrlNotWatching   = "http://localhost/api/carlistnotwatching/";
+
+        private String bidStoreUrl              = "http://localhost/bidstore/getbidsforlist/";
 
 
 
-        public CarRest() {
+        public FilterCarListRest() {
                 this.carWatchService = new RestTemplate();
                 this.carWatchService.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
                 this.carStoreService = new RestTemplate();
                 this.carStoreService.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+                this.bidStoreService = new RestTemplate();
+                this.bidStoreService.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
         }
 
         @RequestMapping(value = "/buyernotwatching/{name}",
@@ -72,11 +81,26 @@ public class CarRest {
                 if(carsBuyerIsWatchingDto.getVins() == null || carsBuyerIsWatchingDto.getVins().isEmpty() ) {
                         returns = new ArrayList<>();
                 } else {
-
                         returns = this.carStoreService.postForObject(this.carStoreUrlWatching, carsBuyerIsWatchingDto, ((Class<List<Car>>) (Object) List.class), vars);
+                        Map<String, Bid> highestBidMap = this.bidStoreService.postForObject(this.bidStoreUrl, carsBuyerIsWatchingDto.getVins(), ((Class<Map<String, Bid>>) (Object) Map.class), vars);
+                        this.updateHighestBidsForReturnToClient(name, returns, highestBidMap);
                 }
                 HttpHeaders httpHeaders = new HttpHeaders();
                 return new ResponseEntity<>(returns, httpHeaders, HttpStatus.OK);
+        }
+
+        private void updateHighestBidsForReturnToClient(String name, List<Car> cars, Map<String, Bid> highestBidMap) {
+                for (Car car : cars) {
+                        if (highestBidMap.containsKey(car.getVin() )) {
+                                Bid bid = highestBidMap.get(car.getVin());
+                                car.setHighestBid(bid.getAmount());
+                                if (name.equals(bid.getId())) {
+                                        car.setMyBid(true);
+                                }
+                        } else {
+                                car.setHighestBid(new BigDecimal(0));
+                        }
+                }
         }
 
         private List<String> getCarBuyerIsWatchingList(String name) {
