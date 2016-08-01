@@ -15,6 +15,7 @@ import com.rta.filtercarlist.stream.CarSource;
 import com.rta.filtercarlist.dto.Car;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,11 @@ public class CarRest {
 
         private String carWatchServiceUrl = new String("http://localhost/watchingcars/getwatchlist/{name}");
 
-        private String carStoreUrl = new String("http://localhost/api/carlistwatching/");
+        private String carStoreUrlWatching = new String("http://localhost/api/carlistwatching/");
+
+        private String carStoreUrlNotWatching = new String("http://localhost/api/carlistnotwatching/");
+
+
 
         public CarRest() {
                 this.carWatchService = new RestTemplate();
@@ -51,7 +56,7 @@ public class CarRest {
                 CarBuyerIsWatchingDto carsBuyerIsWatchingDto = new CarBuyerIsWatchingDto();
                 carsBuyerIsWatchingDto.setVins(this.getCarBuyerIsWatchingList(name));
                 @SuppressWarnings("unchecked")
-                List<Car> returns = this.carStoreService.postForObject(carStoreUrl, carsBuyerIsWatchingDto, ((Class<List<Car>>)(Object)List.class), vars);
+                List<Car> returns = this.carStoreService.postForObject(carStoreUrlNotWatching, carsBuyerIsWatchingDto, ((Class<List<Car>>)(Object)List.class), vars);
                 HttpHeaders httpHeaders = new HttpHeaders();
                 return new ResponseEntity<>(returns, httpHeaders, HttpStatus.OK);
         }
@@ -59,11 +64,17 @@ public class CarRest {
         @RequestMapping(value = "/buyerwatching/{name}",
                 method = RequestMethod.GET,
                 produces = MediaType.APPLICATION_JSON_VALUE)
+        @SuppressWarnings("unchecked")
         public ResponseEntity<List<Car>> getCarsBuyerWatching(@PathVariable String name) throws URISyntaxException {
                 CarBuyerIsWatchingDto carsBuyerIsWatchingDto = new CarBuyerIsWatchingDto();
                 carsBuyerIsWatchingDto.setVins(this.getCarBuyerIsWatchingList(name));
-                @SuppressWarnings("unchecked")
-                List<Car> returns = this.carStoreService.postForObject(carStoreUrl, carsBuyerIsWatchingDto, ((Class<List<Car>>)(Object)List.class), vars);
+                List<Car> returns = null;
+                if(carsBuyerIsWatchingDto.getVins() == null || carsBuyerIsWatchingDto.getVins().isEmpty() ) {
+                        returns = new ArrayList<>();
+                } else {
+
+                        returns = this.carStoreService.postForObject(this.carStoreUrlWatching, carsBuyerIsWatchingDto, ((Class<List<Car>>) (Object) List.class), vars);
+                }
                 HttpHeaders httpHeaders = new HttpHeaders();
                 return new ResponseEntity<>(returns, httpHeaders, HttpStatus.OK);
         }
