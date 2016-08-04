@@ -5,6 +5,7 @@ import com.rta.filtercarlist.dto.CarBuyerIsWatchingDto;
 import com.rta.filtercarlist.dto.ResponseBuyerWatching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,12 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.rta.filtercarlist.stream.CarSource;
 import com.rta.filtercarlist.dto.Car;
 
-import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -36,16 +35,16 @@ public class FilterCarListRest {
 
         private RestTemplate bidStoreService;
 
-        @Value("${demo.domainname}")
-        private String domainname;
+        @Autowired
+        Environment env;
 
-        private String carWatchServiceUrl;
+        private String carWatchServiceUrl       = "http://localhost/watchingcars/getwatchlist/{name}";
 
-        private String carStoreUrlWatching;
+        private String carStoreUrlWatching      = "http://localhost/api/carlistwatching/";
 
-        private String carStoreUrlNotWatching;
+        private String carStoreUrlNotWatching   = "http://localhost/api/carlistnotwatching/";
 
-        private String bidStoreUrl;
+        private String bidStoreUrl              = "http://localhost/bidstore/getbidsforlist/";
 
 
 
@@ -58,6 +57,8 @@ public class FilterCarListRest {
 
                 this.bidStoreService = new RestTemplate();
                 this.bidStoreService.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+                String domainname = env.getProperty("demo.domainname");
 
                 this.carWatchServiceUrl       = "http://" + domainname + "/watchingcars/getwatchlist/{name}";
                 this.carStoreUrlWatching      = "http://" + domainname + "/api/carlistwatching/";
