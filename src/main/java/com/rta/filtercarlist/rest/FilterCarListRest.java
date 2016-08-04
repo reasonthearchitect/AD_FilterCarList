@@ -5,7 +5,6 @@ import com.rta.filtercarlist.dto.CarBuyerIsWatchingDto;
 import com.rta.filtercarlist.dto.ResponseBuyerWatching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import com.rta.filtercarlist.stream.CarSource;
 import com.rta.filtercarlist.dto.Car;
 
+import javax.annotation.PostConstruct;
 import java.net.URISyntaxException;
 import java.util.*;
 
@@ -35,8 +35,8 @@ public class FilterCarListRest {
 
         private RestTemplate bidStoreService;
 
-        @Autowired
-        Environment env;
+        @Value("${demo.domainname}")
+        private String domainname;
 
         private String carWatchServiceUrl       = "http://localhost/watchingcars/getwatchlist/{name}";
 
@@ -57,13 +57,14 @@ public class FilterCarListRest {
 
                 this.bidStoreService = new RestTemplate();
                 this.bidStoreService.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+        }
 
-                String domainname = env.getProperty("demo.domainname");
-
-                this.carWatchServiceUrl       = "http://" + domainname + "/watchingcars/getwatchlist/{name}";
-                this.carStoreUrlWatching      = "http://" + domainname + "/api/carlistwatching/";
-                this.carStoreUrlNotWatching   = "http://" + domainname + "/api/carlistnotwatching/";
-                this.bidStoreUrl              = "http://" + domainname + "/bidstore/getbidsforlist/";
+        @PostConstruct
+        public void setupurls() {
+            this.carWatchServiceUrl       = "http://" + domainname + "/watchingcars/getwatchlist/{name}";
+            this.carStoreUrlWatching      = "http://" + domainname + "/api/carlistwatching/";
+            this.carStoreUrlNotWatching   = "http://" + domainname + "/api/carlistnotwatching/";
+            this.bidStoreUrl              = "http://" + domainname + "/bidstore/getbidsforlist/";
         }
 
         @RequestMapping(value = "/buyernotwatching/{name}",
