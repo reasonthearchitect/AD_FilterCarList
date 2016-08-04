@@ -10,5 +10,5 @@ node {
     //sh 'docker kill filtercarlist'
     //sh 'docker rm filtercarlist'
     sh 'docker build -t reasonthearchitect/filtercarlist .'
-    sh 'docker run -d --name bidstore -p 8220:8220 reasonthearchitect/filtercarlist'
+    sh 'docker run -d --name filtercarlist -p 8220:8220 reasonthearchitect/filtercarlist'
 }
