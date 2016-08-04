@@ -1,10 +1,12 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'spring-boot'
-apply plugin: 'war'
 
-archivesBaseName = 'filterCarList'
-description = ''
+jar{
+    baseName = 'filtercarlist'
+    version = '0.0.1-SNAPSHOT'
+    description = ''
+}
 
 defaultTasks 'bootRun'
 

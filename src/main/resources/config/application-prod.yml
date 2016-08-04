@@ -1,3 +1,6 @@
+management.security.enabled: false
+security.basic.enabled: false
+
 server:
     port: 8220
 
@@ -7,6 +10,12 @@ liquibase:
 spring:
     profiles:
         active: prod
+    cloud:
+        stream:
+            kafka:
+                binder:
+                    zkNodes: 172.31.55.162
+                    brokers: 172.31.55.162
     
 metrics:
     jmx.enabled: true
@@ -20,6 +29,3 @@ metrics:
         port: 2003
         prefix: filterCarList
 
-http:
-    cache:
-        timeToLiveInDays: 31
