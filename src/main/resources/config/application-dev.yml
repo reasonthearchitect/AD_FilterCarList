@@ -1,6 +1,9 @@
 management.security.enabled: false
 security.basic.enabled: false
 
+demo:
+    domainname: localhost
+
 server:
     port: 8220
 

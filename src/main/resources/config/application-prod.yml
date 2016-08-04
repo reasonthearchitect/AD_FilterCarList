@@ -4,6 +4,9 @@ security.basic.enabled: false
 server:
     port: 8220
 
+demo:
+    domainname: reasonthearchitect.com
+
 liquibase:
     context: prod
 

@@ -4,6 +4,7 @@ import com.rta.filtercarlist.dto.Bid;
 import com.rta.filtercarlist.dto.CarBuyerIsWatchingDto;
 import com.rta.filtercarlist.dto.ResponseBuyerWatching;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -35,13 +36,16 @@ public class FilterCarListRest {
 
         private RestTemplate bidStoreService;
 
-        private String carWatchServiceUrl       = "http://localhost/watchingcars/getwatchlist/{name}";
+        @Value("${demo.domainname}")
+        private String domainname;
 
-        private String carStoreUrlWatching      = "http://localhost/api/carlistwatching/";
+        private String carWatchServiceUrl;
 
-        private String carStoreUrlNotWatching   = "http://localhost/api/carlistnotwatching/";
+        private String carStoreUrlWatching;
 
-        private String bidStoreUrl              = "http://localhost/bidstore/getbidsforlist/";
+        private String carStoreUrlNotWatching;
+
+        private String bidStoreUrl;
 
 
 
@@ -54,6 +58,11 @@ public class FilterCarListRest {
 
                 this.bidStoreService = new RestTemplate();
                 this.bidStoreService.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+                this.carWatchServiceUrl       = "http://" + domainname + "/watchingcars/getwatchlist/{name}";
+                this.carStoreUrlWatching      = "http://" + domainname + "/api/carlistwatching/";
+                this.carStoreUrlNotWatching   = "http://" + domainname + "/api/carlistnotwatching/";
+                this.bidStoreUrl              = "http://" + domainname + "/bidstore/getbidsforlist/";
         }
 
         @RequestMapping(value = "/buyernotwatching/{name}",
