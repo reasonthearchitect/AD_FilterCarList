@@ -1,0 +1,25 @@
+server:
+  port: 8220
+
+---
+spring:
+  profiles:
+    active: dev
+  application:
+    name: filtercarlist
+  cloud:
+    config:
+      enabled: false
+
+---
+server:
+  port: 8220
+spring:
+  profiles:
+    active: prod
+  application:
+    name: filtercarlist
+  cloud:
+    config:
+      enabled: true
+      uri: http://config.reasonthearchitect.com
