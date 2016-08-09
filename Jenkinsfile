@@ -3,8 +3,7 @@ node {
     git url: 'https://github.com/reasonthearchitect/AD_FilterCarList.git'
 
     stage 'Build'
-    sh "./gradlew clean build"
-    //step([$class: 'JUnitResultArchiver', testResults: '**/build/test-results/TEST-*.xml'])
+    sh "./gradlew clean build sonarqube"
 
     stage 'BuildRunDocker'
     sh 'docker kill filtercarlist'

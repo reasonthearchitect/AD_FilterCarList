@@ -38,13 +38,13 @@ public class FilterCarListRest {
         @Value("${demo.domainname}")
         private String domainname;
 
-        private String carWatchServiceUrl       = "http://localhost/watchingcars/getwatchlist/{name}";
+        private String carWatchServiceUrl;
 
-        private String carStoreUrlWatching      = "http://localhost/api/carlistwatching/";
+        private String carStoreUrlWatching;
 
-        private String carStoreUrlNotWatching   = "http://localhost/api/carlistnotwatching/";
+        private String carStoreUrlNotWatching;
 
-        private String bidStoreUrl              = "http://localhost/bidstore/getbidsforlist/";
+        private String bidStoreUrl;
 
 
 
@@ -61,10 +61,11 @@ public class FilterCarListRest {
 
         @PostConstruct
         public void setupurls() {
-            this.carWatchServiceUrl       = "http://" + domainname + "/watchingcars/getwatchlist/{name}";
-            this.carStoreUrlWatching      = "http://" + domainname + "/api/carlistwatching/";
-            this.carStoreUrlNotWatching   = "http://" + domainname + "/api/carlistnotwatching/";
-            this.bidStoreUrl              = "http://" + domainname + "/bidstore/getbidsforlist/";
+            String http = "http://";
+            this.carWatchServiceUrl       = http + domainname + "/watchingcars/getwatchlist/{name}";
+            this.carStoreUrlWatching      = http + domainname + "/api/carlistwatching/";
+            this.carStoreUrlNotWatching   = http + domainname + "/api/carlistnotwatching/";
+            this.bidStoreUrl              = http + domainname + "/bidstore/getbidsforlist/";
         }
 
         @RequestMapping(value = "/buyernotwatching/{name}",
